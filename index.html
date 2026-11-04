@@ -202,7 +202,23 @@ async function sendFile(bl,fn){const cl=window.claude;
  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:fn});return}
  const u=URL.createObjectURL(bl),l=document.createElement('a');l.href=u;l.download=fn;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),9000)}
 function pdf() {
+    // 1. Browser ka original title save karein
+    let oldTitle = document.title;
+    
+    // 2. Invoice no. aur Customer ka naam jodkar naya naam banayein
+    // (Special characters jaise '/' ko '-' me badal dega taaki file save me error na aaye)
+    let fileName = (D.no + ' ' + D.cust).replace(/[\\/:*?"<>|]+/g, '-').trim();
+    
+    // 3. Print command chalne se theek pehle page ka title change karein
+    document.title = fileName || "Invoice";
+    
+    // 4. Print / PDF window open karein
     window.print();
+    
+    // 5. 2 second baad webpage ka title wapas normal (SlateBill) kar dein
+    setTimeout(function() {
+        document.title = oldTitle;
+    }, 2000);
 }
 const FL=(o,k,l,t)=>`<label>${l}<input value="${esc(o[k])}" oninput="${t}.${k}=this.value;save()"></label>`;
 function setup(){
