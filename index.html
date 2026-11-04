@@ -201,13 +201,9 @@ async function sendFile(bl,fn){const cl=window.claude;
  const f=new File([bl],fn,{type:bl.type||'application/pdf'});
  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:fn});return}
  const u=URL.createObjectURL(bl),l=document.createElement('a');l.href=u;l.download=fn;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),9000)}
-async function pdf(){const b=$('#pdfb'),t=b.textContent;b.textContent='Preparing…';b.disabled=true;
- try{const el=$('#ov .paper'),c=await html2canvas(el,{scale:el.scrollHeight>2200?1.5:2,backgroundColor:'#fff',windowWidth:820,onclone:d=>{['#app','nav','.bar'].forEach(s=>{const e=d.querySelector(s);if(e)e.style.display='none'});d.querySelector('#ov').style.cssText='position:static;overflow:visible;padding:0;background:#fff';d.querySelector('.sc').style.cssText='overflow:visible;padding:0';d.documentElement.style.padding='0'}});
-  const P=new jspdf.jsPDF('p','pt','a4'),W=P.internal.pageSize.getWidth(),PH=P.internal.pageSize.getHeight(),h=c.height*W/c.width,im=c.toDataURL('image/jpeg',.92);
-  for(let y=0,k=0;y<h-2;y+=PH,k++){if(k)P.addPage();P.addImage(im,'JPEG',0,-y,W,h)}
-  await sendFile(P.output('blob'),(D.no+' '+D.cust).replace(/[\\/:*?"<>|]+/g,'-').trim()+'.pdf')
- }catch(e){if(!e||(e.code!='declined'&&e.name!='AbortError'))toast('PDF nahi ban paya: '+((e&&e.message)||'error'))}
- b.textContent=t;b.disabled=false}
+function pdf() {
+    window.print();
+}
 const FL=(o,k,l,t)=>`<label>${l}<input value="${esc(o[k])}" oninput="${t}.${k}=this.value;save()"></label>`;
 function setup(){
  const bz=`<details class="card"${ob>=0?' open':''}><summary><b>Businesses / Accounts (${S.biz.length})</b></summary><p class="m">Invoice, receipt me business yahin se chuna jata hai. Naya account yahan add karo.</p><p><button onclick="addb()">+ Add business / account</button></p>${S.biz.map((x,i)=>`<details${ob==i?' open':''}><summary>${esc(x.name)}${x.bank?' · '+esc(x.bank):''}</summary><label>Name<input value="${esc(x.name)}" onchange="rb(${i},this.value)"></label>${[['addr','Address'],['mob','Mobile'],['mail','E-mail'],['pan','PAN'],['acc','Account name'],['bank','Bank'],['br','Branch'],['ifsc','IFSC'],['ac','A/c no.']].map(([k,l])=>FL(x,k,l,`S.biz[${i}]`)).join('')}${IMG(i,'sig','Signature (invoice, receipt, requirement par)')}${IMG(i,'qr1','Profile barcode / QR (invoice ke top par)')}${IMG(i,'qr2','Payment barcode / QR: GPay ya account (invoice ke neeche)')}${S.biz.length>1?`<button class="x" onclick="rmb(${i})">${dbz==i?'Tap again to delete':'Delete business'}</button>`:''}</details>`).join('')}</details>`;
